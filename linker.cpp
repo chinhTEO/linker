@@ -41,11 +41,13 @@ void linker::reset(){
 
 void linker::update(){
     uint8_t charactor;
+
     if((millis() - buffer_time) > CUT_OFF_TIME)
         reset();
 
     while(Serial.available()){
         charactor = Serial.read();
+
         if(charactor & 0x01 == 0x01){
             if(buffer_position == 0){      
                 buffer[buffer_position] = charactor;
@@ -64,10 +66,11 @@ void linker::update(){
                 ++buffer_position;
                 buffer_time = millis();
             }
+
         }
     }
 }
 
 unsigned int linker::read(int position){
-    return int_num[position];
+    return package[position];
 }
