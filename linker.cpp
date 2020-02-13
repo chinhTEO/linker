@@ -1,6 +1,14 @@
 #include "linker.h"
+#include "stdio.h"
 
 linker::linker(){
+    this->softSerial = null;
+    buffer_time = 0;
+    buffer_position = 7;
+}
+
+linker::linker(SoftwareSerial *softSerial){
+    this->softSerial = softSerial;
     buffer_time = 0;
     buffer_position = 7;
 }
@@ -10,7 +18,10 @@ linker::~linker(){
 }
 
 void linker::begin(unsigned long value){
-    Serial.begin(value);
+    if(softSerial == null)
+        Serial.begin(value);
+    else
+        softSerial.begin(value);
 }
 void linker::send(byte position, uint16_t value){
     uint8_t *value_8;
@@ -21,9 +32,16 @@ void linker::send(byte position, uint16_t value){
     bitWrite(header, 2, bitRead(value_8[0],0));
     bitWrite(header, 1, bitRead(value_8[1],0));
 
-    Serial.write(header | 0x01); 
-    Serial.write((value_8[0] >> 1) << 1);   
-    Serial.write((value_8[1] >> 1) << 1);   
+
+    if(softSerial == null){
+        Serial.write(header | 0x01); 
+        Serial.write((value_8[0] >> 1) << 1);   
+        Serial.write((value_8[1] >> 1) << 1); 
+    }else{
+        softSerial.write(header | 0x01); 
+        softSerial.write((value_8[0] >> 1) << 1);   
+        softSerial.write((value_8[1] >> 1) << 1); 
+    }
 }
 
 void linker::reset(){
@@ -45,28 +63,55 @@ void linker::update(){
     if((millis() - buffer_time) > CUT_OFF_TIME)
         reset();
 
-    while(Serial.available()){
-        charactor = Serial.read();
+    if(softSerial == null){
+        while(Serial.available()){
+            charactor = Serial.read();
 
-        if(charactor & 0x01 == 0x01){
-            if(buffer_position == 0){      
-                buffer[buffer_position] = charactor;
-                ++buffer_position;
-                buffer_time = millis();
-            }
-        }else {
-            if(buffer_position == 2){
-                buffer[buffer_position] = charactor;
-                portData();
-                reset();
-            }
-            
-            if(buffer_position == 1){
-                buffer[buffer_position] = charactor;
-                ++buffer_position;
-                buffer_time = millis();
-            }
+            if(charactor & 0x01 == 0x01){
+                if(buffer_position == 0){      
+                    buffer[buffer_position] = charactor;
+                    ++buffer_position;
+                    buffer_time = millis();
+                }
+            }else {
+                if(buffer_position == 2){
+                    buffer[buffer_position] = charactor;
+                    portData();
+                    reset();
+                }
+                
+                if(buffer_position == 1){
+                    buffer[buffer_position] = charactor;
+                    ++buffer_position;
+                    buffer_time = millis();
+                }
 
+            }
+        }
+    }else{
+        while(softSerial.available()){
+            charactor = softSerial.read();
+
+            if(charactor & 0x01 == 0x01){
+                if(buffer_position == 0){      
+                    buffer[buffer_position] = charactor;
+                    ++buffer_position;
+                    buffer_time = millis();
+                }
+            }else {
+                if(buffer_position == 2){
+                    buffer[buffer_position] = charactor;
+                    portData();
+                    reset();
+                }
+                
+                if(buffer_position == 1){
+                    buffer[buffer_position] = charactor;
+                    ++buffer_position;
+                    buffer_time = millis();
+                }
+
+            }
         }
     }
 }

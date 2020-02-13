@@ -2,6 +2,7 @@
 #define LINKER_H_ 1
 #include <arduino.h>
 #include <stdint.h>
+#include <SoftwareSerial.h>
 
 #define MAX_PACK_NUM 32
 #define MAX_TIME_WAITING 500
@@ -10,6 +11,7 @@
 class linker{
     public:
         linker();
+        linker(SoftwareSerial *softSerial)
         ~linker();
 
         void begin(unsigned long value);
@@ -25,6 +27,7 @@ class linker{
         uint8_t buffer[3];
         int buffer_position;
         uint16_t package[MAX_PACK_NUM];
+        SoftwareSerial *softSerial;
 };
 
 #endif
