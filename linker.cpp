@@ -61,7 +61,7 @@ void linker::update(){
                 reset();
             }
             
-            if(buffer_position == 1)
+            if(buffer_position == 1){
                 buffer[buffer_position] = charactor;
                 ++buffer_position;
                 buffer_time = millis();
