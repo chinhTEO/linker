@@ -82,7 +82,7 @@ void linker::sync(){
         last_send_time = millis();
     }
 
-    if((millis() - buffer_time) > CUT_OFF_TIME)
+    if((millis() - last_recieve_time) > CUT_OFF_TIME)
         reset();
 
     if(softSerial == null){
@@ -95,7 +95,6 @@ void linker::sync(){
                 if(buffer_position == 0){      
                     buffer[buffer_position] = charactor;
                     ++buffer_position;
-                    buffer_time = millis();
                 }
             }else {
                 if(buffer_position == 2){
@@ -107,7 +106,6 @@ void linker::sync(){
                 if(buffer_position == 1){
                     buffer[buffer_position] = charactor;
                     ++buffer_position;
-                    buffer_time = millis();
                 }
 
             }
