@@ -3,14 +3,10 @@
 //MAXIUM is 31
 #define SPEED 0
 
-
 linker mavlink;
 unsigned long delay_time;
 void setup() {
   mavlink.begin(9600);  
-  
-  //MAXIUM for value is (2^16 - 1)
-  mavlink.set(SPEED, 255);
 }
 
 void loop() {
@@ -18,13 +14,15 @@ void loop() {
   mavlink.sync();
   
   if(mavlink.isConnected()){
-    //  
+    /* code */ 
   }else
   {
     /* code */
   }
   
-  delay(500);
+  if(millis() - delay_time > 1000)
+  {
+    Serial.println(mavlink.read(SPEED));
+    delay_time = millis();
+  }
 }
-
-
