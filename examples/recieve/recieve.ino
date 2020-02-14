@@ -11,7 +11,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  mavlink.update();
+  mavlink.sync();
   if(millis() - delay_time > 1000)
   {
 
