@@ -13,7 +13,7 @@
 class linker{
     public:
         linker();
-        linker(SoftwareSerial *softSerial)
+        linker(SoftwareSerial *softSerial);
         ~linker();
 
         void begin(unsigned long value);
@@ -35,7 +35,7 @@ class linker{
         int buffer_position;
         
         uint16_t package[MAX_PACK_NUM];
-        uint16_t package_local[MAX_PACK_NUM]
+        uint16_t package_local[MAX_PACK_NUM];
         uint8_t package_ptr;
 
         SoftwareSerial *softSerial;

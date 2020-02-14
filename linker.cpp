@@ -2,15 +2,21 @@
 #include "stdio.h"
 
 linker::linker(){
-    this->softSerial = null;
+    this->softSerial = NULL;
     buffer_time = 0;
     buffer_position = 7;
+    last_recieve_time = 0;
+    last_send_time = 0;
+    package_ptr = 0;
 }
 
 linker::linker(SoftwareSerial *softSerial){
     this->softSerial = softSerial;
     buffer_time = 0;
     buffer_position = 7;
+    last_recieve_time = 0;
+    last_send_time = 0;
+    package_ptr = 0;
 }
 
 linker::~linker(){
@@ -18,7 +24,7 @@ linker::~linker(){
 }
 
 void linker::begin(unsigned long value){
-    if(softSerial == null)
+    if(softSerial == NULL)
         Serial.begin(value);
     else
         softSerial->begin(value);
@@ -34,7 +40,7 @@ void linker::set(byte position, uint16_t value){
     bitWrite(header, 1, bitRead(value_8[1],0));
 
 
-    if(softSerial == null){
+    if(softSerial == NULL){
         Serial.write(header | 0x01); 
         Serial.write((value_8[0] >> 1) << 1);   
         Serial.write((value_8[1] >> 1) << 1); 
@@ -48,7 +54,7 @@ void linker::set(byte position, uint16_t value){
 }
 
 bool linker::isConnected(){
-    return (millis() - sync_time) > SYNC_TIME_OUT ? false : true;
+    return (millis() - last_recieve_time) > SYNC_TIME_OUT ? false : true;
 }
 
 void linker::reset(){
@@ -65,7 +71,7 @@ void linker::reset(){
  }
 
 void linker::sendHeartBeat(){
-    send(package_ptr, package_local[package_ptr]);
+    set(package_ptr, package_local[package_ptr]);
    
     package_ptr ++;
     
@@ -85,7 +91,7 @@ void linker::sync(){
     if((millis() - last_recieve_time) > CUT_OFF_TIME)
         reset();
 
-    if(softSerial == null){
+    if(softSerial == NULL){
         while(Serial.available()){
             last_recieve_time = millis();
 
